@@ -6,11 +6,14 @@
 from setuptools import setup
 
 
-with open("esm/version.py") as infile:
-    exec(infile.read())
+with open("esm/version.py") as f:
+    exec(f.read())
 
 with open("README.md") as f:
     readme = f.read()
+
+with open("requirements.txt") as f:
+    requirements = f.read().splitlines()
 
 extras = {
     "esmfold": [  # OpenFold does not automatically pip install requirements, so we add them here.
@@ -53,4 +56,5 @@ setup(
             "esm-fold=esm.scripts.fold:main",
         ]
     },
+    install_requires=requirements,
 )
