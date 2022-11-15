@@ -13,7 +13,7 @@ with open("README.md") as f:
     readme = f.read()
 
 extras = {
-    "esmfold": [ # OpenFold does not automatically pip install requirements, so we add them here.
+    "esmfold": [  # OpenFold does not automatically pip install requirements, so we add them here.
         "biopython",
         "deepspeed==0.5.9",
         "dm-tree",
