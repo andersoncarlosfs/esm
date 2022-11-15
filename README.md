@@ -209,8 +209,16 @@ Besides `esm.pretrained.esmfold_v1()` which is the best performing model we reco
 also provide `esm.pretrained.esmfold_v0()` which was used for the experiments in
 [Lin et al. 2022](https://doi.org/10.1101/2022.07.20.500902).
 
-We also provide a script (`scripts/esmfold_inference.py`) that efficiently predicts structures in bulk from a FASTA file using ESMFold. This can be run with
-
+We also provide a script (`esm-fold` or `scripts/esmfold_inference.py`) that efficiently predicts structures in bulk from a FASTA file using ESMFold. This can be run with one of the following commands:
+```bash
+ esm-fold \
+    -i <input file with multiple sequences> \
+    -o <path to output directory> \
+    --max-tokens-per-batch <int, default: 1024> \
+    --num-recycles <int, default: 4> \
+    --cpu-only <boolean flag>
+    --cpu-offload <boolean flag>
+```
 ```bash
 python scripts/esmfold_inference.py \
     -i <input file with multiple sequences> \
@@ -232,8 +240,12 @@ The `--cpu-offload` flag can be useful for making predictions on longer sequence
 
 We provide a script that efficiently extracts embeddings in bulk from a FASTA file.
 A cuda device is optional and will be auto-detected.
-The following command extracts the final-layer embedding for a FASTA file from the ESM-2 model:
+The following commands allow the extraction of the final-layer embedding for a FASTA file from the ESM-2 model:
 
+```bash
+esm-extract esm2_t33_650M_UR50D examples/data/some_proteins.fasta \
+  examples/data/some_proteins_emb_esm2 --repr_layers 0 32 33 --include
+```
 ```bash
 python scripts/extract.py esm2_t33_650M_UR50D examples/data/some_proteins.fasta \
   examples/data/some_proteins_emb_esm2 --repr_layers 0 32 33 --include mean per_tok
@@ -291,7 +303,7 @@ For example, to sample 3 sequence designs for the golgi casein kinase structure
 (PDB [5YH2](https://www.rcsb.org/structure/5yh2); [PDB Molecule of the Month
 from January 2022](https://pdb101.rcsb.org/motm/265)), we can run the following
 command from the esm root directory:
-```
+```bash
 python examples/inverse_folding/sample_sequences.py examples/inverse_folding/data/5YH2.pdb \
   --chain C --temperature 1 --num-samples 3 --outpath examples/inverse_folding/output/sampled_sequences.fasta
 ```
