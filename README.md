@@ -44,6 +44,7 @@ ESMFold harnesses the ESM-2 language model to generate accurate structure predic
   - [CPU offloading for inference with large models](#fsdp)
   - [Zero-shot variant prediction](#zs_variant)
   - [Inverse folding](#invf)
+  - [Command-line interface](#cli)
 - [ESM Metagenomic Atlas](#atlas)
 - [Notebooks](#notebooks)
 - [Available Models and Datasets](#available)
@@ -315,6 +316,65 @@ distribution for sequence sampling. Higher sampling temperatures yield more
 diverse sequences but likely with lower native sequence recovery.
 The default sampling temperature is 1. To optimize for native sequence
 recovery, we recommend sampling with low temperature such as 1e-6.
+
+### Command-line interface <a name="cli"></a>
+We provide a command line interface for extraction of embeddings from ESM or prediction of structures in bulk from a FASTA file using ESMFold.
+```
+usage: esm-extract [-h] [--toks_per_batch TOKS_PER_BATCH]
+                   [--repr_layers REPR_LAYERS [REPR_LAYERS ...]] --include
+                   {mean,per_tok,bos,contacts}
+                   [{mean,per_tok,bos,contacts} ...]
+                   [--truncation_seq_length TRUNCATION_SEQ_LENGTH]
+                   model_location fasta_file output_dir
+
+Extract per-token representations and model outputs for sequences in a FASTA
+file
+
+positional arguments:
+  model_location        PyTorch model file OR name of pretrained model to
+                        download (see README for models)
+  fasta_file            FASTA file on which to extract representations
+  output_dir            output directory for extracted representations
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --toks_per_batch TOKS_PER_BATCH
+                        maximum batch size
+  --repr_layers REPR_LAYERS [REPR_LAYERS ...]
+                        layers indices from which to extract representations
+                        (0 to num_layers, inclusive)
+  --include {mean,per_tok,bos,contacts} [{mean,per_tok,bos,contacts} ...]
+                        specify which representations to return
+  --truncation_seq_length TRUNCATION_SEQ_LENGTH
+                        truncate sequences longer than the given value
+```
+```
+usage: esm-fold [-h] -i FASTA -o PDB [--num-recycles NUM_RECYCLES]
+                [--max-tokens-per-batch MAX_TOKENS_PER_BATCH]
+                [--chunk-size CHUNK_SIZE] [--cpu-only] [--cpu-offload]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i FASTA, --fasta FASTA
+                        Path to input FASTA file
+  -o PDB, --pdb PDB     Path to output PDB directory
+  --num-recycles NUM_RECYCLES
+                        Number of recycles to run. Defaults to number used in
+                        training (4).
+  --max-tokens-per-batch MAX_TOKENS_PER_BATCH
+                        Maximum number of tokens per gpu forward-pass. This
+                        will group shorter sequences together for batched
+                        prediction. Lowering this can help with out of memory
+                        issues, if these occur on short sequences.
+  --chunk-size CHUNK_SIZE
+                        Chunks axial attention computation to reduce memory
+                        usage from O(L^2) to O(L). Equivalent to running a for
+                        loop over chunks of of each dimension. Lower values
+                        will result in lower memory usage at the cost of
+                        speed. Recommended values: 128, 64, 32. Default: None.
+  --cpu-only            CPU only
+  --cpu-offload         Enable CPU offloading
+```
 
 #### Scoring sequences
 To score the conditional log-likelihoods for sequences conditioned on a given
